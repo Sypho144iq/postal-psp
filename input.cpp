@@ -587,6 +587,8 @@ extern void ClearLocalInput(void)
 		{
 		ms_acheats[i].sCurrentIndex	= 0;
 		}
+	}
+
 #ifdef __vita__
 #include <vitasdk.h>
 #endif
