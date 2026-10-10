@@ -78,7 +78,9 @@ typedef struct
 
 static JoyState		ms_ajsCurr[NUM_JOYSTICKS];		// Current joystick state.
 static JoyState		ms_ajsPrev[NUM_JOYSTICKS];		// Previous joystick state.
+#ifndef __PSP__
 static SDL_GameController *ms_Controllers[NUM_JOYSTICKS];
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 // Internal functions.
@@ -98,21 +100,19 @@ static SDL_GameController *ms_Controllers[NUM_JOYSTICKS];
 //////////////////////////////////////////////////////////////////////////////
 extern void Joy_Init(void)
 	{
+#ifdef __PSP__
+        sceCtrlSetSamplingCycle(0);
+        sceCtrlSetSamplingMode(PSP_CTRL_MODE_ANALOG);
+        return;
+#else
         if ((SDL_InitSubSystem(SDL_INIT_JOYSTICK)) || (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER)))
             return;
 
-#if !defined(PSP2) && !defined(__PSP__)
+#if !defined(PSP2)
         SDL_JoystickEventState(SDL_IGNORE);
         SDL_GameControllerEventState(SDL_IGNORE);
 #endif
 
-#ifdef __PSP__
-        sceCtrlSetSamplingCycle(0);
-        sceCtrlSetSamplingMode(PSP_CTRL_MODE_ANALOG);
-#endif
-
-
-#ifndef __PSP__
         const int sticks = SDL_NumJoysticks();
         int opened = 0;
         int seen = 0;

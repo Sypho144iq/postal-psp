@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           psp-pacman -Sy --noconfirm
-          psp-pacman -S --noconfirm psp-sdl psp-libvorbis psp-libogg || true
+          psp-pacman -S --noconfirm sdl libvorbis libogg || true
 
       - name: Compile POSTAL for PSP
         run: |
