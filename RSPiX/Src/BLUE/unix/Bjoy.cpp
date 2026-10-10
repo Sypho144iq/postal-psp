@@ -30,12 +30,19 @@
 
 #include "SDL.h"
 #include "Blue.h"
+#include <math.h>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #ifdef PSP2
 #include <vitasdk.h>
 #elif defined(__PSP__)
 #include <pspkernel.h>
 #include <pspctrl.h>
 #endif
+
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -105,6 +112,7 @@ extern void Joy_Init(void)
 #endif
 
 
+#ifndef __PSP__
         const int sticks = SDL_NumJoysticks();
         int opened = 0;
         int seen = 0;
@@ -129,7 +137,9 @@ extern void Joy_Init(void)
             ASSERT(!opened);
             // !!! FIXME: maybe show a message box saying "we see a stick, configure it in Big Picture"?
         }
+#endif
 	}
+
 
 
 #ifndef __PSP__
@@ -211,8 +221,6 @@ static inline double GetStickAngle(Sint32 axis_X, Sint32 axis_Y)
 #if defined(ALLOW_TWINSTICK)
 extern void GetDudeVelocity(double* d_Velocity, double* d_Angle)
 {
-	SDL_GameController* controller = ms_Controllers[0];
-
 	Sint16 axis_MoveUpDown = ms_ajsCurr[0].axis_MoveUpDown;
 	Sint16 axis_MoveLeftRight = ms_ajsCurr[0].axis_MoveLeftRight;
 
@@ -230,10 +238,9 @@ extern void GetDudeVelocity(double* d_Velocity, double* d_Angle)
 //////////////////////////////////////////////////////////////////////////////
 extern bool GetDudeFireAngle(double* d_Angle)
 {
-	SDL_GameController* controller = ms_Controllers[0];
-
 	Sint16 axis_FireUpDown = ms_ajsCurr[0].axis_FireUpDown;
 	Sint16 axis_FireLeftRight = ms_ajsCurr[0].axis_FireLeftRight;
+
 
 	if (axis_FireLeftRight != 0)
 		*d_Angle = GetStickAngle(axis_FireLeftRight, axis_FireUpDown);
@@ -360,47 +367,10 @@ extern void rspUpdateJoy(int16_t sJoy)
         calcButton(pad.buttons, SCE_CTRL_DOWN, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_13);
         calcButton(pad.buttons, SCE_CTRL_LEFT, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_14);
         calcButton(pad.buttons, SCE_CTRL_RIGHT, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_15);
-#elif defined(__PSP__)
-        ms_ajsCurr[sJoy].u32Buttons = 0;
-        ms_ajsCurr[sJoy].u32Axes = 0;
-        SceCtrlData pad;
-        sceCtrlPeekBufferPositive(&pad, 1);
-
-        calcButton(pad.Buttons, PSP_CTRL_CROSS, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_1);
-        calcButton(pad.Buttons, PSP_CTRL_CIRCLE, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_2);
-        calcButton(pad.Buttons, PSP_CTRL_SQUARE, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_3);
-        calcButton(pad.Buttons, PSP_CTRL_TRIANGLE, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_4);
-        calcButton(pad.Buttons, PSP_CTRL_SELECT, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_5);
-        calcButton(pad.Buttons, PSP_CTRL_START, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_7);
-        calcButton(pad.Buttons, PSP_CTRL_LTRIGGER, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_10);
-        calcButton(pad.Buttons, PSP_CTRL_RTRIGGER, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_11);
-        calcButton(pad.Buttons, PSP_CTRL_UP, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_12);
-        calcButton(pad.Buttons, PSP_CTRL_DOWN, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_13);
-        calcButton(pad.Buttons, PSP_CTRL_LEFT, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_14);
-        calcButton(pad.Buttons, PSP_CTRL_RIGHT, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_15);
-
-        // PSP Analog Nub
-        int lx = ((int)pad.Lx) - 128;
-        int ly = ((int)pad.Ly) - 128;
-        if (abs(lx) < 20) lx = 0;
-        if (abs(ly) < 20) ly = 0;
-
-        Sint16 axisX = (Sint16)(lx * 256);
-        Sint16 axisY = (Sint16)(ly * 256);
-
-#if defined(ALLOW_TWINSTICK)
-        ms_ajsCurr[sJoy].axis_MoveLeftRight = axisX;
-        ms_ajsCurr[sJoy].axis_MoveUpDown = axisY;
-        ms_ajsCurr[sJoy].axis_FireLeftRight = 0;
-        ms_ajsCurr[sJoy].axis_FireUpDown = 0;
-#endif
-        if (axisX > 16384)  ms_ajsCurr[sJoy].u32Axes |= RSP_JOY_X_POS;
-        if (axisX < -16384) ms_ajsCurr[sJoy].u32Axes |= RSP_JOY_X_NEG;
-        if (axisY > 16384)  ms_ajsCurr[sJoy].u32Axes |= RSP_JOY_Y_POS;
-        if (axisY < -16384) ms_ajsCurr[sJoy].u32Axes |= RSP_JOY_Y_NEG;
 #else
         ms_ajsCurr[sJoy].u32Buttons = 0;
 #endif
+
 
 
 	}
