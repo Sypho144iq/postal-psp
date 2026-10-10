@@ -1,0 +1,39 @@
+name: Build Postal 1 PSP
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+  workflow_dispatch:
+
+jobs:
+  build-psp:
+    runs-on: ubuntu-latest
+    container:
+      image: pspdev/pspdev:latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Compile POSTAL for PSP
+        run: |
+          make -f Makefile.psp -j$(nproc)
+
+      - name: Verify EBOOT.PBP
+        run: |
+          ls -lh EBOOT.PBP postal.elf
+
+      - name: Package PSP EBOOT
+        run: |
+          mkdir -p POSTAL_PSP
+          cp EBOOT.PBP POSTAL_PSP/
+          if [ -f res/icon0.png ]; then cp res/icon0.png POSTAL_PSP/; fi
+          echo "Place original Postal 1 'res/' and 'title/' game folders here." > POSTAL_PSP/README.txt
+
+      - name: Upload EBOOT.PBP Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Postal-1-PSP-EBOOT
+          path: POSTAL_PSP/
