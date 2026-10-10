@@ -132,6 +132,7 @@ extern void Joy_Init(void)
 	}
 
 
+#ifndef __PSP__
 static void calcAxis(SDL_GameController *controller, const SDL_GameControllerAxis axis, U32 *bits, const U32 posbit, const U32 negbit)
 {
     const Sint16 deadzone = (Sint16) (32767.0f * (MID_THRESHOLD_PERCENT / 100.0f));
@@ -141,6 +142,7 @@ static void calcAxis(SDL_GameController *controller, const SDL_GameControllerAxi
     else if ((val > 0) && (val > deadzone))
         *bits |= posbit;
 }
+#endif
 
 static inline void calcButton(uint32_t buttons, uint32_t button, U32 *bits, const U32 posbit)
 {
@@ -148,6 +150,7 @@ static inline void calcButton(uint32_t buttons, uint32_t button, U32 *bits, cons
         *bits |= posbit;
 }
 
+#ifndef __PSP__
 static void GetAxesNew(SDL_GameController* controller, Sint16* out_axis_MoveUpDown, Sint16* out_axis_MoveLeftRight, Sint16* out_axis_FireUpDown, Sint16* out_axis_FireLeftRight)
 {
 	// deadzone shit
@@ -179,6 +182,8 @@ static void GetAxesNew(SDL_GameController* controller, Sint16* out_axis_MoveUpDo
 
 	//TRACE("SDL Axes: %f.5 %f.5 %f.5 %f.5\n", axis_MoveUpDown, axis_MoveLeftRight, axis_FireUpDown, axis_FireLeftRight);
 }
+#endif
+
 
 static inline double GetStickAngle(Sint32 axis_X, Sint32 axis_Y)
 {
@@ -300,6 +305,7 @@ extern void rspUpdateJoy(int16_t sJoy)
         return;
 #endif
 
+#ifndef __PSP__
         if ((sJoy > NUM_JOYSTICKS) || (ms_Controllers[sJoy] == NULL))
             return;
 
@@ -332,6 +338,8 @@ extern void rspUpdateJoy(int16_t sJoy)
         //calcAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT, &ms_ajsCurr[sJoy].u32Axes, RSP_JOY_U_POS, RSP_JOY_U_NEG);
         //calcAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT, &ms_ajsCurr[sJoy].u32Axes, RSP_JOY_V_POS, RSP_JOY_V_NEG);
 //#endif
+#endif
+
 
 #if defined(PSP2)
         ms_ajsCurr[sJoy].u32Buttons = 0;

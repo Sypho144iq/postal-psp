@@ -254,9 +254,10 @@ extern void rspSetMouse(
 		int16_t sX,				// New x position.
 		int16_t sY)				// New y position.
 	{
-        if (!mouse_grabbed)
-            return;  // drop mouse events if input isn't grabbed.
+#ifndef __PSP__
         SDL_WarpMouseInWindow(sdlWindow, sX, sY);
+#endif
+
 	}
 
 //////////////////////////////////////////////////////////////////////////////

@@ -34,6 +34,11 @@
 #include "BLUE/Blue.h"
 #include "ORANGE/CDT/QUEUE.H"
 
+#ifdef __PSP__
+typedef SDLKey SDL_Keycode;
+#endif
+
+
 
 #define MAX_EVENTS	256
 // Only set value if not NULL.
@@ -76,8 +81,11 @@ extern void Key_Event(SDL_Event *event)
     //ASSERT(event->key.keysym.sym < SDLK_LAST);
 
     const U8 pushed = (event->type == SDL_KEYDOWN);
+#ifndef __PSP__
     if ((pushed) && (event->key.repeat) && (!sdlKeyRepeat))
         return;  // drop it.
+#endif
+
 
     U8 key = sdl_to_rws_keymap[event->key.keysym.sym];
     U16 gkey = sdl_to_rws_gkeymap[event->key.keysym.sym];

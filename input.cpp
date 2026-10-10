@@ -773,6 +773,10 @@ void GetResModifer(
 			int screen_height = 480;
 			int16_t render_width = 640;
 			int16_t render_height = 480;
+#ifdef __PSP__
+			screen_width = 480;
+			screen_height = 272;
+#else
 			SDL_DisplayMode dm_Mode;
 
 			//Returns 0 on success...
@@ -782,6 +786,8 @@ void GetResModifer(
 				screen_width = dm_Mode.w;
 				screen_height = dm_Mode.h;
 			}
+#endif
+
 
 			//Get rendered resolution (not alway 640x480)
 			rspGetVideoMode(NULL, NULL, NULL, NULL, &render_width, &render_height, NULL, NULL);

@@ -185,16 +185,24 @@ INCDIR = . \
 	RSPiX/Src/ORANGE/GameLib \
 	RSPiX/Src/ORANGE/File \
 	RSPiX/Src/ORANGE/Multigrid \
+	RSPiX/Src/ORANGE/MsgBox \
+	RSPiX/Src/ORANGE/str \
+	RSPiX/Src/ORANGE/Parse \
+	RSPiX/Src/ORANGE/RString \
 	RSPiX/Src/GREEN/Image \
+	RSPiX/Src/GREEN/BLiT \
 	WishPiX \
 	WishPiX/Spry \
+	WishPiX/Menu \
+	WishPiX/Prefs \
+	WishPiX/ResourceManager \
 	$(PSPPATH)/include \
 	$(PSPPATH)/include/SDL
 
 DEFINES = -DPLATFORM_UNIX -D__PSP__ -DTARGET=POSTAL_2015 -DLOCALE=US -DALLOW_TWINSTICK
 
 CFLAGS = -O2 -G0 -w -fsigned-char $(DEFINES) -fno-optimize-sibling-calls
-CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -std=gnu++11 -fpermissive
+CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -std=gnu++11 -fpermissive -Wno-narrowing -Wno-write-strings
 ASFLAGS = $(CFLAGS)
 
 LIBDIR =
