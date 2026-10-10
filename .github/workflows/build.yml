@@ -17,6 +17,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: |
+          psp-pacman -Sy --noconfirm
+          psp-pacman -S --noconfirm psp-sdl psp-libvorbis psp-libogg || true
+
       - name: Compile POSTAL for PSP
         run: |
           make -f Makefile.psp -j$(nproc)

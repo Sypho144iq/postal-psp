@@ -253,10 +253,58 @@ extern bool GetDudeFireAngle(double* d_Angle)
 //////////////////////////////////////////////////////////////////////////////
 extern void rspUpdateJoy(int16_t sJoy)
 	{
+#ifdef __PSP__
+        if (sJoy >= NUM_JOYSTICKS)
+            return;
+
+        SDL_memcpy(&ms_ajsPrev[sJoy], &ms_ajsCurr[sJoy], sizeof (JoyState));
+        ms_ajsCurr[sJoy].u32Buttons = 0;
+        ms_ajsCurr[sJoy].u32Axes = 0;
+
+        SceCtrlData pad;
+        sceCtrlPeekBufferPositive(&pad, 1);
+
+        calcButton(pad.Buttons, PSP_CTRL_CROSS, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_1);
+        calcButton(pad.Buttons, PSP_CTRL_CIRCLE, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_2);
+        calcButton(pad.Buttons, PSP_CTRL_SQUARE, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_3);
+        calcButton(pad.Buttons, PSP_CTRL_TRIANGLE, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_4);
+        calcButton(pad.Buttons, PSP_CTRL_SELECT, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_5);
+        calcButton(pad.Buttons, PSP_CTRL_START, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_7);
+        calcButton(pad.Buttons, PSP_CTRL_LTRIGGER, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_10);
+        calcButton(pad.Buttons, PSP_CTRL_RTRIGGER, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_11);
+        calcButton(pad.Buttons, PSP_CTRL_UP, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_12);
+        calcButton(pad.Buttons, PSP_CTRL_DOWN, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_13);
+        calcButton(pad.Buttons, PSP_CTRL_LEFT, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_14);
+        calcButton(pad.Buttons, PSP_CTRL_RIGHT, &ms_ajsCurr[sJoy].u32Buttons, RSP_JOY_BUT_15);
+
+        // PSP Analog Nub
+        int lx = ((int)pad.Lx) - 128;
+        int ly = ((int)pad.Ly) - 128;
+        if (abs(lx) < 20) lx = 0;
+        if (abs(ly) < 20) ly = 0;
+
+        Sint16 axisX = (Sint16)(lx * 256);
+        Sint16 axisY = (Sint16)(ly * 256);
+
+#if defined(ALLOW_TWINSTICK)
+        ms_ajsCurr[sJoy].axis_MoveLeftRight = axisX;
+        ms_ajsCurr[sJoy].axis_MoveUpDown = axisY;
+        ms_ajsCurr[sJoy].axis_FireLeftRight = 0;
+        ms_ajsCurr[sJoy].axis_FireUpDown = 0;
+#endif
+
+        if (axisX > 16384)  ms_ajsCurr[sJoy].u32Axes |= RSP_JOY_X_POS;
+        if (axisX < -16384) ms_ajsCurr[sJoy].u32Axes |= RSP_JOY_X_NEG;
+        if (axisY > 16384)  ms_ajsCurr[sJoy].u32Axes |= RSP_JOY_Y_POS;
+        if (axisY < -16384) ms_ajsCurr[sJoy].u32Axes |= RSP_JOY_Y_NEG;
+        return;
+#endif
+
         if ((sJoy > NUM_JOYSTICKS) || (ms_Controllers[sJoy] == NULL))
             return;
 
         SDL_GameController *controller = ms_Controllers[sJoy];
+
         SDL_GameControllerUpdate();
 
         if (!SDL_GameControllerGetAttached(controller))
