@@ -48,6 +48,7 @@ typedef SDLKey SDL_Keycode;
 #define SDLK_KP_9 SDLK_KP9
 #define SDLK_LGUI SDLK_LMETA
 #define SDLK_RGUI SDLK_RMETA
+#define SDLK_PRINTSCREEN SDLK_PRINT
 #define SDL_Keymod SDLMod
 #endif
 
