@@ -330,8 +330,10 @@ extern void rspSetApplicationName(
 {
     SDL_free(sdlAppName);
     sdlAppName = SDL_strdup(pszName);
+#if !defined(PSP2) && !defined(__PSP__)
     if (sdlWindow)
         SDL_SetWindowTitle(sdlWindow, sdlAppName);
+#endif
 }
 
 
@@ -594,7 +596,7 @@ extern void rspQueryVideoModeReset(void)
         ASSERT(SDL_WasInit(SDL_INIT_VIDEO));
 
 		// Attempt to grab user's current desktop resolution instead of forcing 640x480
-#ifndef MOBILE
+#if !defined(MOBILE) && !defined(PSP2) && !defined(__PSP__)
 		SDL_DisplayMode dm_Mode;
 		int i_Result = SDL_GetDesktopDisplayMode(0, &dm_Mode);
 		dm_Mode.w = 960;
@@ -1160,8 +1162,10 @@ extern int16_t rspLockVideoBuffer(	// Returns 0 if system buffer could be locked
 												// NULL returned on failure.
 	int32_t*		plPitch)						// Pitch of system buffer returned here.
 	{
+#if !defined(PSP2) && !defined(__PSP__)
     if (!sdlWindow)
         return -1;
+#endif
 
     *ppvBuffer = PalettedTexturePointer;
     *plPitch = FramebufferWidth;
