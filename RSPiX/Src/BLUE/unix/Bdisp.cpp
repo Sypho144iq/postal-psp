@@ -44,6 +44,8 @@ vita2d_pgf* credits_font = nullptr;
 #endif
 
 #ifdef __PSP__
+#include <malloc.h>
+#include <stdlib.h>
 #include <pspkernel.h>
 #include <pspdisplay.h>
 #include <pspgu.h>
@@ -653,6 +655,7 @@ extern int16_t rspQueryVideoMode(			// Returns 0 for each valid mode, then non-z
 	}
 
 
+#if !defined(PSP2) && !defined(__PSP__)
 static SDL_Renderer *createRendererToggleVsync(SDL_Window *window, const int index, bool vsync)
 {
     SDL_Renderer *retval = NULL;
@@ -685,6 +688,7 @@ static SDL_Renderer *createRendererByName(SDL_Window *window, const char *name)
     }
     return NULL;
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -730,6 +734,19 @@ extern int16_t rspSetVideoMode(	// Returns 0 if successfull, non-zero otherwise
         for (size_t i = 0; i < 256; i++)
             apeApp[i].a = 0xFF;
 
+#ifdef __PSP__
+        FramebufferWidth = 640;
+        FramebufferHeight = 480;
+        psp_init_gu();
+        PalettedTexturePointer = (Uint8*)memalign(16, FramebufferWidth * FramebufferHeight * sizeof(Uint8));
+        if (!PalettedTexturePointer)
+        {
+            PalettedTexturePointer = (Uint8*)malloc(FramebufferWidth * FramebufferHeight * sizeof(Uint8));
+        }
+        SDL_memset(PalettedTexturePointer, '\0', FramebufferWidth * FramebufferHeight * sizeof(Uint8));
+        return 0;
+#endif
+
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 
         if (sPixelDoubling)
@@ -738,10 +755,7 @@ extern int16_t rspSetVideoMode(	// Returns 0 if successfull, non-zero otherwise
             return -1;
         }
 
-#ifdef __PSP__
-        FramebufferWidth = 640;
-        FramebufferHeight = 480;
-#elif defined(PSP2)
+#if defined(PSP2)
         FramebufferWidth = 960/*sWidth*/;
         FramebufferHeight = 544/*sHeight*/;
 #else
@@ -831,14 +845,6 @@ extern int16_t rspSetVideoMode(	// Returns 0 if successfull, non-zero otherwise
 		credits_font = vita2d_load_default_pgf();
 		PalettedTexturePointer = (uint8_t*)vita2d_texture_get_datap(tex_buffer);
 		SDL_memset(PalettedTexturePointer, '\0', FramebufferWidth * FramebufferHeight * sizeof (Uint8));
-#elif defined(__PSP__)
-		psp_init_gu();
-		PalettedTexturePointer = (Uint8*)memalign(16, FramebufferWidth * FramebufferHeight * sizeof(Uint8));
-		if (!PalettedTexturePointer)
-		{
-			PalettedTexturePointer = (Uint8*)malloc(FramebufferWidth * FramebufferHeight * sizeof(Uint8));
-		}
-		SDL_memset(PalettedTexturePointer, '\0', FramebufferWidth * FramebufferHeight * sizeof(Uint8));
 #else
 		sdlTexture = SDL_CreateTexture(sdlRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, FramebufferWidth, FramebufferHeight);
         if (!sdlTexture)
@@ -917,6 +923,9 @@ extern void rspCacheDirtyRect(
 {
 }
 
+char cheat_input[256] = {};
+
+#ifdef PSP2
 void ascii2utf(uint16_t* dst, char* src){
 	if(!src || !dst)return;
 	while(*src)*(dst++)=(*src++);
@@ -933,7 +942,7 @@ static uint16_t title[SCE_IME_DIALOG_MAX_TITLE_LENGTH];
 static uint16_t initial_text[SCE_IME_DIALOG_MAX_TEXT_LENGTH];
 static uint16_t input_text[SCE_IME_DIALOG_MAX_TEXT_LENGTH + 1];
 char title_keyboard[256] = {};
-char cheat_input[256] = {};
+#endif
 
 extern void rspPresentFrame(void)
 {
