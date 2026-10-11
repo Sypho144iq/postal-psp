@@ -173,7 +173,12 @@ typedef HRESULT (WINAPI *fnSHGetFolderPathW)(HWND hwnd, int nFolder, HANDLE hTok
 	#include "file.h"
 #endif	// PATHS_IN_INCLUDES
 
+#ifdef PSP2
 #include <vitasdk.h>
+#elif defined(__PSP__)
+#include <pspkernel.h>
+#include <pspiofilemgr.h>
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 // Module specific macros.
@@ -422,8 +427,11 @@ extern const char *FindCorrectFile(const char *_pszName, const char *pszMode)
                 }
             }*/
 			
-			const char xdghomedir[128];
-			sprintf(xdghomedir, "%s", "ux0:data/Postal");
+#ifdef __PSP__
+			char xdghomedir[128] = ".";
+#else
+			char xdghomedir[128] = "ux0:data/Postal";
+#endif
 			const char *append = "";
 
             snprintf(prefpath, sizeof (prefpath), "%s%s/PostalPlus/", xdghomedir, append);
@@ -460,10 +468,19 @@ extern const char *FindCorrectFile(const char *_pszName, const char *pszMode)
     static char finalname[PATH_MAX];
     static bool bail_early = true;
 	
+#ifdef __PSP__
+	if (pszName[0] == '.' && pszName[1] == '/') {
+		if (pszName[2] == '.' && pszName[3] == '/') sprintf(finalname, "%s", &pszName[4]);
+		else sprintf(finalname, "%s", &pszName[2]);
+	} else sprintf(finalname, "%s", pszName);
+#elif defined(PSP2)
 	if (pszName[0] == '.' && pszName[1] == '/') {
 		if (pszName[2] == '.' && pszName[3] == '/') sprintf(finalname, "ux0:data/postal/%s", &pszName[4]);
 		else sprintf(finalname, "ux0:data/postal/%s", &pszName[2]);
-	}else sprintf(finalname, "ux0:data/postal/%s", pszName);
+	} else sprintf(finalname, "ux0:data/postal/%s", pszName);
+#else
+	snprintf(finalname, sizeof (finalname), "%s", pszName);
+#endif
 
     //locateCorrectCase(finalname);
 	TRACE("finalname is \"%s\"\n", finalname);
