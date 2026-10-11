@@ -36,6 +36,19 @@
 
 #ifdef __PSP__
 typedef SDLKey SDL_Keycode;
+#define SDLK_KP_0 SDLK_KP0
+#define SDLK_KP_1 SDLK_KP1
+#define SDLK_KP_2 SDLK_KP2
+#define SDLK_KP_3 SDLK_KP3
+#define SDLK_KP_4 SDLK_KP4
+#define SDLK_KP_5 SDLK_KP5
+#define SDLK_KP_6 SDLK_KP6
+#define SDLK_KP_7 SDLK_KP7
+#define SDLK_KP_8 SDLK_KP8
+#define SDLK_KP_9 SDLK_KP9
+#define SDLK_LGUI SDLK_LMETA
+#define SDLK_RGUI SDLK_RMETA
+#define SDL_Keymod SDLMod
 #endif
 
 
@@ -96,6 +109,7 @@ extern void Key_Event(SDL_Event *event)
 
     if (pushed)
     {
+#ifndef __PSP__
         if ( (event->key.keysym.sym == SDLK_g) )
         {
             if (event->key.keysym.mod & KMOD_CTRL) // ctrl-g
@@ -119,6 +133,7 @@ extern void Key_Event(SDL_Event *event)
                 return;  // don't pass this key event on to the game.
             }
         }
+#endif
 
         if (ms_qkeEvents.IsFull() == FALSE)
 	    {
@@ -462,6 +477,9 @@ extern void rspSetQuitStatusFlags(	// Returns nothing.
 
 extern int32_t rspGetToggleKeyStates(void)	// Returns toggle key state flags.
 	{
+#ifdef __PSP__
+	return 0;
+#else
 	int32_t	lKeyStates	= 0;
 
     const Uint8 *states = SDL_GetKeyboardState(NULL);
@@ -477,6 +495,7 @@ extern int32_t rspGetToggleKeyStates(void)	// Returns toggle key state flags.
 		lKeyStates |= RSP_CAPS_LOCK_ON;
 
 	return lKeyStates;
+#endif
 	}
 
 
