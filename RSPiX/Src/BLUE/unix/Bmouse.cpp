@@ -83,7 +83,12 @@ extern void rspGetMouse(
 		int16_t* psY,				// Current y position is returned here (unless NULL)
 		int16_t* psButton)		// Current button status is returned here (unless NULL)
 	{
-
+#ifdef __PSP__
+    SET(psX, 0);
+    SET(psY, 0);
+    SET(psButton, 0);
+    return;
+#else
     if (!mouse_grabbed)
     {
         int w, h;
@@ -111,11 +116,15 @@ extern void rspGetMouse(
 		}
 
 	MouseWheelState = 0;
+#endif
 	}
 
 
 extern void Mouse_Event(SDL_Event *event)
 {
+#ifdef __PSP__
+    return;
+#else
 	static int16_t	sEventIndex	= 0;
 
 
@@ -242,6 +251,7 @@ extern void Mouse_Event(SDL_Event *event)
 		newpme->sButton = MouseWheelState;
 		ms_qmeEvents.EnQ(newpme);
 	}
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -359,9 +369,11 @@ extern void rspClearMouseEvents(void)
 ///////////////////////////////////////////////////////////////////////////////
 extern void rspHideMouseCursor(void)
 	{
+#ifndef __PSP__
 	// Decrement show cursor count.
     if (--ms_sCursorShowLevel < 0)
 	    SDL_ShowCursor(0);
+#endif
 	}
 
 //////////////////////////////////////////////////////////////////////////////
@@ -372,9 +384,11 @@ extern void rspHideMouseCursor(void)
 ///////////////////////////////////////////////////////////////////////////////
 extern void rspShowMouseCursor(void)
 	{
+#ifndef __PSP__
 	// Increment show cursor count.
 	if (++ms_sCursorShowLevel >= 0)
 	    SDL_ShowCursor(1);
+#endif
 	}
 
 ///////////////////////////////////////////////////////////////////////////////
